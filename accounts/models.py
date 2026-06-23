@@ -1,12 +1,31 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+CITY_CHOICES = [
+    ('Amman', 'عمان'),
+    ('Irbid', 'إربد'),
+    ('Zarqa', 'الزرقاء'),
+    ('Mafraq', 'المفرق'),
+    ('Jerash', 'جرش'),
+    ('Ajloun', 'عجلون'),
+    ('Salt', 'السلط (البلقاء)'),
+    ('Madaba', 'مأدبا'),
+    ('Karak', 'الكرك'),
+    ('Tafilah', 'الطفيلة'),
+    ('Ma\'an', 'معان'),
+    ('Aqaba', 'العقبة'),
+]
+
 # Hospitals table
 class Hospital(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hospital_profile')
     name = models.CharField(max_length=255)
     license_number = models.CharField(max_length=50, unique=True) 
-    city = models.CharField(max_length=100)
+    city = models.CharField(
+        max_length=50, 
+        choices=CITY_CHOICES, 
+        default='Amman'
+    )
     address = models.TextField()
     phone_number = models.CharField(max_length=20)
 
@@ -22,7 +41,11 @@ class Donor(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='donor_profile')
     blood_type = models.CharField(max_length=3, choices=BLOOD_TYPES)
-    city = models.CharField(max_length=100)
+    city = models.CharField(
+        max_length=50, 
+        choices=CITY_CHOICES, 
+        default='Amman'
+    )
     phone_number = models.CharField(max_length=20)
     last_donation_date = models.DateField(null=True, blank=True)
     is_available = models.BooleanField(default=True) 
