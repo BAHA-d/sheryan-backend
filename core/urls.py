@@ -16,8 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.view_site if hasattr(admin.site, 'view_site') else admin.site.urls),
     path('api/', include('accounts.urls')), # ربط روابط مشروع شريان وتبدأ بـ api/
+
+    # السطر الجديد: يسمح لك بتسجيل الدخول مباشرة من واجهة الـ API بالمتصفح
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    
+    # روابط الحماية وتوليد التوكن
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # لتسجيل الدخول والحصول على التوكن
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # لتحديث التوكن المنتهي
+
 ]

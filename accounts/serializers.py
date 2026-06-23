@@ -30,3 +30,4 @@ class BloodRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = BloodRequest
         fields = ['id', 'hospital', 'hospital_name', 'blood_type', 'units_requested', 'urgency', 'status', 'created_at']
+        read_only_fields = ['hospital'] # إخبار دجانقو بأن هذا الحقل يُحقن من السيرفر ولا ينتظر مدخلات من المستخدم
