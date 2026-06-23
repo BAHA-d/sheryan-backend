@@ -56,12 +56,21 @@ class BloodRequestViewSet(viewsets.ModelViewSet):
 
         # جلب الفصائل المتوافقة مع الطلب الحالي، إذا لم تكن موجودة نكتفي بنفس الفصيلة كأمان
         compatible_types = compatibility_map.get(requested_type, [requested_type])
+        # 🗓️ حساب تاريخ الأمان الطبي (90 يوماً قبل الآن)
+    
+        safe_donation_date = timezone.now().date() - timedelta(days=90)
 
         # 3. الاستعلام الذكي (Query) من قاعدة البيانات:
         # فحص المتبرعين الذين يمتلكون فصيلة متوافقة وَ متواجدين في نفس مدينة المستشفى
+       # 3. 🎯 الاستعلام المحدث بـ تفاصيل التفاصيل الطبية والجغرافية:
+        from django.db.models import Q
         matching_donors = Donor.objects.filter(
             blood_type__in=compatible_types,
-            city__iexact=hospital_city # iexact تقارن النصوص بدون الحساسية لحالة الأحرف (Capital/Small)
+            city__iexact=hospital_city,
+            is_available=True, #  الشرط 1: الحساب متاح ونشط
+        ).filter(
+            #  الشرط 2: مر على تبرعه أكثر من 90 يوم أو لم يسبق له التبرع مطلقاً
+            Q(last_donation_date__lte=safe_donation_date) | Q(last_donation_date__isnull=True)
         )
 
         # 4. تحويل بيانات المتبرعين إلى JSON باستخدام الـ Serializer الخاص بهم وإرجاعها
