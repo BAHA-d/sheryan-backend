@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Hospital, Donor, BloodRequest
 from .serializers import HospitalSerializer, DonorSerializer, BloodRequestSerializer
 from .permissions import IsHospitalUser # استيراد الصلاحية الجديدة
+from django.utils import timezone
+from datetime import timedelta
 
 # 1️⃣ الـ View الخاص بالمستشفيات
 class HospitalViewSet(viewsets.ModelViewSet):
@@ -71,3 +73,43 @@ class BloodRequestViewSet(viewsets.ModelViewSet):
             "total_matches": matching_donors.count(),
             "matches": serializer.data
         }, status=status.HTTP_200_OK)
+    #  الرابط المخصص الثاني: api/requests/{id}/complete/
+    @action(detail=True, methods=['post'], permission_classes=[IsHospitalUser])
+    def complete(self, request, pk=None):
+        """
+        تسمح للمستشفى (صاحب الطلب) بتغيير حالة الطلب إلى مكتمل (Completed).
+        """
+        blood_request = self.get_object()
+        
+        #  فحص أمني صارم: هل المستشفى الحالي هو صاحب الطلب؟
+        if blood_request.hospital != request.user.hospital_profile:
+            return Response(
+                {"detail": "غير مسموح لك بتعديل طلب تابع لمستشفى آخر."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # تحديث الحالة وحفظها
+        blood_request.status = 'Completed'
+        blood_request.save()
+        
+        return Response({
+            "message": "تم إغلاق طلب الدم بنجاح واكتمال وحدات التبرع.",
+            "status": blood_request.status
+        }, status=status.HTTP_200_OK)
+    
+
+
+    def get_queryset(self):
+        # 1. جلب الوقت الحالي
+        now = timezone.now()
+        # تحديد عتبة الوقت (قبل 48 ساعة من الآن)
+        expiry_threshold = now - timedelta(days=2)
+        
+        # 2. أتمتة ذكية: جلب كل الطلبات المعلقة التي تجاوزت 48 ساعة وتحديثها إلى Expired دفعة واحدة بكفاءة
+        BloodRequest.objects.filter(
+            status='Pending',
+            created_at__lt=expiry_threshold
+        ).update(status='Expired')
+        
+        # 3. إرجاع القائمة كاملة بعد التحديث
+        return BloodRequest.objects.all().order_by('-created_at')
