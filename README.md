@@ -22,7 +22,7 @@ Built and secured following industry-standard software engineering practices:
 > 💡 **Repository Roadmap:**
 > * [x] Containerize the entire application using **Docker & Docker Compose**.
 > * [x] Implement comprehensive automated testing using **Pytest**.
-> * [ ] Build a continuous integration pipeline (**CI/CD**) via **GitHub Actions**.
+> * [x] Build a continuous integration pipeline (**CI/CD**) via **GitHub Actions**.
 
 ---
 
