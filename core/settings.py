@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,7 +83,7 @@ DATABASES = {
         'NAME': 'sheryan_db',
         'USER': 'sheryan_user',
         'PASSWORD': 'sheryan_secure_pass',
-        'HOST': 'db',  # اسم الخدمة (service name) المكتوب في docker-compose.yml
+        'HOST': os.environ.get('DB_HOST', 'db'),  # اسم الخدمة (service name) المكتوب في docker-compose.yml
         'PORT': '5432',
     }
 }
