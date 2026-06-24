@@ -20,6 +20,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.view_site if hasattr(admin.site, 'view_site') else admin.site.urls),
@@ -31,5 +32,13 @@ urlpatterns = [
     # روابط الحماية وتوليد التوكن
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # لتسجيل الدخول والحصول على التوكن
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # لتحديث التوكن المنتهي
-
+    #روابط التوثيق
+    # 1. رابط لتوليد ملف الـ Schema (ملف الـ JSON الأساسي)
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    
+    # 2. رابط واجهة Swagger التفاعلية الرائعة
+    path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    
+    # 3. رابط واجهة ReDoc الأنيقة (شكل بديل ومنظم جداً للقراءة)
+    path('api/docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

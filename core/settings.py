@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # our  & external apps
     'rest_framework',
+    'drf_spectacular',
     'accounts',
 ]
 
@@ -126,6 +127,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication', # عشان دجانغو يقبل جلسة التصفح اثناء التطوير
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # إعدادات الـ JWT وتحديد صلاحية التوكن (مثلاً الوصول ينتهي بعد 5 أيام لتسهيل التطوير حالياً)
@@ -137,4 +139,11 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+# إعدادات الـ Swagger (اسم المشروع ووصفه)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sheryan API (شريان)',
+    'DESCRIPTION': 'النظام الخلفي لمنصة شريان لتنظيم وإرسال إشعارات التبرع بالدم تلقائياً',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
