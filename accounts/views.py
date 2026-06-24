@@ -1,4 +1,4 @@
-from rest_framework import viewsets,status 
+from rest_framework import viewsets,status, permissions, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -7,6 +7,9 @@ from .serializers import HospitalSerializer, DonorSerializer, BloodRequestSerial
 from .permissions import IsHospitalUser # استيراد الصلاحية الجديدة
 from django.utils import timezone
 from datetime import timedelta
+
+from .models import Notification
+from .serializers import NotificationSerializer
 
 # 1️⃣ الـ View الخاص بالمستشفيات
 class HospitalViewSet(viewsets.ModelViewSet):
@@ -122,3 +125,14 @@ class BloodRequestViewSet(viewsets.ModelViewSet):
         
         # 3. إرجاع القائمة كاملة بعد التحديث
         return BloodRequest.objects.all().order_by('-created_at')
+
+class NotificationViewSet(mixins.ListModelMixin,
+                          mixins.RetrieveModelMixin,
+                          mixins.UpdateModelMixin,
+                          viewsets.GenericViewSet):
+    
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def get_queryset(self):
+        # جلب الإشعارات الخاصة بالمستخدم المسجل حالياً فقط
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
