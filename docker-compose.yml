@@ -1,0 +1,36 @@
+# version: '3.8'
+
+services:
+  # 1️⃣ حاوية الباك إند (Django REST Framework)
+  web:
+    build: .
+    container_name: sheryan_backend_container
+    command: python manage.py runserver 0.0.0.0:8000
+    # ربط المجلد المحلي بالحاوية (Volumes) لكي يقرأ دوكر تعديلات الكود فوراً دون إعادة بناء
+    volumes:
+      - .:/app
+    # فتح بورت 8000 لكي تتمكن من فتح السيرفر من متصفح جهازك كالمعتاد
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      # هنا يمكنك مستقبلاً ربط بيانات قاعدة البيانات كمتغيرات بيئة
+    depends_on:
+      - db
+
+  # 2️⃣ حاوية قاعدة البيانات PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: sheryan_postgres_container
+    environment:
+      - POSTGRES_DB=sheryan_db
+      - POSTGRES_USER=sheryan_user
+      - POSTGRES_PASSWORD=sheryan_secure_pass
+    # حفظ بيانات قاعدة البيانات على جهازك لكي لا تضيع عند إغلاق الحاوية
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

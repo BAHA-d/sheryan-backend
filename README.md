@@ -20,7 +20,7 @@ Built and secured following industry-standard software engineering practices:
 * **Version Control:** Git & GitHub
 
 > 💡 **Repository Roadmap:**
-> * [ ] Containerize the entire application using **Docker & Docker Compose**.
+> * [x] Containerize the entire application using **Docker & Docker Compose**.
 > * [x] Implement comprehensive automated testing using **Pytest**.
 > * [ ] Build a continuous integration pipeline (**CI/CD**) via **GitHub Actions**.
 
